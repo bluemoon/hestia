@@ -1,7 +1,22 @@
 My plans for this project have been very long term, and still are very long term. I plan to use as many external tools as possible and integrate them as tightly as i can without restricting the program design.
 
+## Core Code
+[ ] Basic Gui
+ [ ] Project dialogs
+ [ ] Project language settings
+ [ ] Global settings
+ [ ] Light editor
+[ ] Modular plugins
+ [ ] API for plugins
+
+## Code coverage
+figleaf: ...
+
 ## Static Analysis
 dehydra: https://developer.mozilla.org/en/Dehydra
+YASCA: ...
+PyChecker: ...
+RATS: ...
 
 ## Disassemblers
 obj2asm: http://www.digitalmars.com/ctg/obj2asm.html
@@ -14,3 +29,7 @@ valgrind: ...
 
 ## Performance Analysis
 gprof: ...
+
+## Unit testing
+(python) nose: ...
+(C++) cxxtest: ...
