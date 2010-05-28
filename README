@@ -1,6 +1,8 @@
+My plans for this project have been very long term, and still are very long term. I plan to use as many external tools as possible and integrate them as tightly as i can without restricting the program design.
 
 ## Static Analysis
 dehydra: https://developer.mozilla.org/en/Dehydra
 
 ## Disassemblers
 obj2asm: http://www.digitalmars.com/ctg/obj2asm.html
+lida: http://lida.sourceforge.net/
