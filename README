@@ -1,13 +1,20 @@
 My plans for this project have been very long term, and still are very long term. I plan to use as many external tools as possible and integrate them as tightly as i can without restricting the program design.
 
 ## Core Code
+
 [ ] Basic Gui
  [ ] Project dialogs
  [ ] Project language settings
  [ ] Global settings
  [ ] Light editor
 [ ] Modular plugins
+ [ ] Message passing for threaded plugins?
+  [ ] MPI?
+  
  [ ] API for plugins
+[ ] Autotests on file changes
+[ ] Dynamic compiler support, cython gcc etc.
+[ ] Basic error detection for the compilers [regex, whatnot]
 
 ## Code coverage
 figleaf: ...
