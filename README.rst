@@ -23,27 +23,33 @@ Core Code
 [ ] Dynamic compiler support, cython gcc etc.
 [ ] Basic error detection for the compilers [regex, whatnot]
 
-## Code coverage
+Code coverage
+-------------
 figleaf: ...
 
-## Static Analysis
+Static Analysis
+---------------
 dehydra: https://developer.mozilla.org/en/Dehydra
-YASCA: ...
-PyChecker: ...
-RATS: ...
+YASCA: 
+PyChecker: 
+RATS: 
 
-## Disassemblers
+Disassemblers
+-------------
 obj2asm: http://www.digitalmars.com/ctg/obj2asm.html
 lida: http://lida.sourceforge.net/
 
-## Memory analysis
+Memory analysis
+---------------
 dmalloc: ...
 daikon: ...
 valgrind: ...
 
-## Performance Analysis
+Performance Analysis
+--------------------
 gprof: ...
 
-## Unit testing
+Unit testing
+------------
 (python) nose: ...
 (C++) cxxtest: ...
