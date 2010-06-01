@@ -9,14 +9,14 @@ My plans for this project have been very long term, and still are very long term
 Core Code
 ---------
 
-[ ] Basic Gui
- [ ] Project dialogs
- [ ] Project language settings
- [ ] Global settings
- [ ] Light editor
-[ ] Modular plugins
- [ ] Message passing for threaded plugins?
-  [ ] MPI?
+- [ ] Basic Gui
+ - [ ] Project dialogs
+ - [ ] Project language settings
+ - [ ] Global settings
+ - [ ] Light editor
+- [ ] Modular plugins
+ - [ ] Message passing for threaded plugins?
+  - [ ] MPI?
   
  [ ] API for plugins
 [ ] Autotests on file changes
