@@ -1,3 +1,4 @@
+from manager_base import PluginManager
 
 class EntryPointPluginManager(PluginManager):
     """Plugin manager that loads plugins from entrypoints.

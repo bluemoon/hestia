@@ -1,3 +1,5 @@
+from multiprocessing import Lock
+from manager_default import DefaultPluginManager
 
 class _Method:
     """Some magic to bind a method to a plugin.
@@ -15,7 +17,7 @@ class _Method:
         return self.__plugin(self.__name, *args)
 
 inst = None
-inst_lock = threading.Lock()
+inst_lock = Lock()
 
 def instance():
     """Singleton constructor.

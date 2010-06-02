@@ -1,3 +1,6 @@
+from manager_base import PluginManager
+
+import re
 
 class ShellPluginManager(PluginManager):
     """Plugin manager that loads shell script plugins from plugin directories.

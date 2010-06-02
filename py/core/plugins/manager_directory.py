@@ -1,3 +1,6 @@
+from manager_base import PluginManager
+
+import os
 
 class DirectoryPluginManager(PluginManager):
     """Plugin manager that loads plugins from plugin directories.
