@@ -6,6 +6,10 @@ and to keep it as user oriented as possible, enabling things like automatic rebu
 on demand. Keep the work "behind the curtains" and let the user get the most done.
 My plans for this project have been very long term, and still are very long term. I plan to use as many external tools as possible and integrate them as tightly as i can without restricting the program design.
 
+Requirements
+------------
+- PyInotify
+
 Core Code
 ---------
 
@@ -25,7 +29,7 @@ Core Code
 
 Code coverage
 -------------
-figleaf: ...
+figleaf: 
 
 Static Analysis
 ---------------
@@ -41,15 +45,15 @@ lida: http://lida.sourceforge.net/
 
 Memory analysis
 ---------------
-dmalloc: ...
-daikon: ...
-valgrind: ...
+dmalloc:
+daikon: 
+valgrind:
 
 Performance Analysis
 --------------------
-gprof: ...
+gprof: 
 
 Unit testing
 ------------
-(python) nose: ...
-(C++) cxxtest: ...
+(python) nose:
+(C++) cxxtest:

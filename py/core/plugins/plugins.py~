@@ -1,0 +1,568 @@
+"""
+## Todo:
+##  create a document specifying the usage and styling of the plugin design
+
+Python Plugin Framework
+=======================
+## There should only be 2 styles of plugins
+##  1) a module with a class that specifies setup/teardown or subclasses Plugin
+##  2) a module that has only functions to be used with setup/teardown as functions
+##     but does not require setup nor teardown
+
+This framework should provide:
+  - Some commonly used plugin managers
+  
+To use one of them, just::
+
+  from core.plugins import DefaultPluginManager
+
+  manager = DefaultPluginManager()
+  manager.loadPlugins()
+  plugins = manager.getPlugins()
+  
+  # After some plugin change, refresh them
+  manager.plguins = []
+  manager.loadPlugins()
+  plugins = manager.getPlugins()
+
+
+Register plugins
+----------------
+
+Important note: different plugin managers may use different means to locate and
+load plugins.
+
+For L{EntryPointPluginManager}, it must be part of a package that uses
+setuptools, and the plugin must be included in the entry points defined in the
+setup.py for the package::
+
+  setup(name="Some plugin",
+        ...
+        entry_points = {
+            "package.plugins": [
+                "someplugin = someplugin:SomePlugin"
+                ]
+            },
+        ...
+        )
+
+Once the package is installed with install or develop, nose will be able
+to load the plugin.
+
+For L{DirectoryPluginManager}, it must be placed under directory C{plugins/}.
+Every plugin file should have a C{__all__} attribute containing the implemented
+plugin class.
+
+Use plugins
+-----------
+
+After you have written you plugin and registered into the framework, the plugin
+manager should be able to load it. Then you can get a proxy of your plugin
+and call the implemented APIs defined in the interface::
+
+  from pkg.plugins.manager import PluginProxy
+
+  try:
+      plugin = PluginProxy("interface", "name")
+  except NotImplementedError:
+      # exception handling
+  # call plugin method
+  plugin.method(args)
+
+"""
+import os
+import re
+import sys
+import logging
+import threading
+
+from warnings import warn
+from imp import find_module, load_module, acquire_lock, release_lock
+
+import plugins.interface
+import inspect
+import textwrap
+
+import pkg.plugins.interface
+
+
+class Plugin(object):
+    """Base class for plugins.
+
+    Plugins should not be enabled by default.
+
+    @cvar name: name
+    @type name: C{str}
+    @cvar description: description
+    @type description: C{str}
+    @cvar vendor: vendor
+    @type vendor: C{str}
+    @cvar copyright: copyright
+    @type copyright: C{str}
+    @cvar plugin_version: plugin version info. A tuple containing the five
+        components of the version number: major, minor, micro, releaselevel,
+        and serial. All values except releaselevel are integers; the release
+        level is 'alpha', 'beta', 'candidate', or 'final'. The version value
+        corresponding to 0.0.1 is (0, 0, 1, 'final', 0).
+    @type plugin_version: C{tuple}
+    @cvar required_api_version: required api version info
+    @type required_api_version: C{tuple}
+    @cvar supported_products: supported products
+    @type supported_products: C{dict}
+    @cvar interface: implemented interface
+    @type interface: C{str}
+    @cvar configuration: configuration options
+    @type configuration: C{dict}
+    #@cvar capabilities: implemented methods
+    #@type capabilities: C{list}
+    #@cvar enabled: enabled
+    #@type enabled: C{bool}
+    #@cvar configurable: configurable
+    #@type configurable: C{bool}
+    """
+    name = None
+    interface = ""
+    description = ""
+    vendor = ""
+    copyright = ""
+    plugin_version = ()
+    required_api_version = ()
+    supported_products = {}
+    configuration = {}
+    #capabilities = []
+    #enabled = False
+    #configurable = False
+
+    def __init__(self):
+        pass
+
+    @classmethod
+    def help(cls):
+        """Return help for this plugin.
+        """
+        if cls.__class__.__doc__:
+            # doc sections are often indented; compress the spaces
+            return textwrap.dedent(cls.__class__.__doc__)
+        return "(no help available)"
+
+    @classmethod
+    def caps(cls):
+        """Return capabilities of this plugin.
+        """
+        return [attr
+                for attr in dir(cls)
+                if inspect.ismethod(getattr(cls, attr)) and \
+                   attr in pkg.plugins.interface.get_caps(cls.interface)]
+
+
+
+log = logging.getLogger("pkg.plugins.manager")
+
+
+class _Method:
+    """Some magic to bind a method to a plugin.
+
+    Supports "nested" methods (e.g. examples.getStateName).
+    """
+    def __init__(self, plugin, name):
+        self.__plugin = plugin
+        self.__name = name
+
+    def __getattr__(self, name):
+        return _Method(self.__plugin, "%s.%s" % (self.__name, name))
+
+    def __call__(self, *args):
+        return self.__plugin(self.__name, *args)
+
+
+class PluginProxy(object):
+    """
+    Proxy for plugin calls.
+
+    Note: it only proxy for the fisrt found plugin.
+    """
+    def __init__(self, interface, name, manager=None):
+        if manager is None:
+            manager = instance()
+        plugins = manager.getPlugins(interface, name)
+        if not plugins:
+            raise NotImplementedError()
+        self.__plugin = plugins[0]
+        self.__plugin_caps = self.__plugin.caps()
+        self.__interface_caps = pkg.plugins.interface.get_caps(interface)
+
+    def __request(self, meth, *args):
+        return getattr(self.__plugin, meth)(*args)
+
+    def __repr__(self):
+        return ("<PluginProxy for %s>" % (self.__plugin))
+
+    __str__ = __repr__
+
+    def __getattr__(self, name):
+        if name in self.__plugin_caps:
+            return _Method(self.__request, name)
+        elif name in self.__interface_caps:
+            raise NotImplementedError()
+        else:
+            return getattr(self.__plugin, name)
+
+
+class PluginManager(object):
+    """Base class for plugin managers. Does not implement loadPlugins, so it
+    may only be used with a static list of plugins.
+    """
+    name = "base"
+
+    def __init__(self, plugins=(), config={}):
+        self.__plugins = []
+        if plugins:
+            self.addPlugins(plugins)
+
+    def __iter__(self):
+        return iter(self.plugins)
+
+    def addPlugin(self, plug):
+        self.__plugins.append(plug)
+
+    def addPlugins(self, plugins):
+        for plug in plugins:
+            self.addPlugin(plug)
+
+    def delPlugin(self, plug):
+        if plug in self.__plugins:
+            self.__plugins.remove(plug)
+
+    def delPlugins(self, plugins):
+        for plug in plugins:
+            self.delPlugin(plug)
+
+    def getPlugins(self, interface=None, name=None):
+        plugins = []
+        for plugin in self.__plugins:
+            if (interface is None or plugin.interface == interface) and \
+               (name is None or plugin.name == name):
+                plugins.append(plugin)
+        return plugins
+
+    def _loadPlugin(self, plug):
+        if plug.required_api_version > pkg.plugins.interface.IPlugin.version:
+            log.warn("version dismatch: requires %s", plug.required_api_version)
+            return
+        loaded = False
+        for p in self.plugins:
+            if p.name == plug.name and \
+                p.interface == plug.interface:
+                loaded = True
+                break
+        if not loaded:
+            self.addPlugin(plug)
+            log.debug("%s: loaded plugin %s implement %s", self.name, plug.name, plug.interface)
+
+    def loadPlugins(self):
+        pass
+
+    def _get_plugins(self):
+        return self.__plugins
+
+    def _set_plugins(self, plugins):
+        self.__plugins = []
+        self.addPlugins(plugins)
+
+    plugins = property(_get_plugins, _set_plugins, None,
+                       """Access the list of plugins managed by
+                       this plugin manager""")
+
+
+class NullPluginManager(object):
+    """Null plugin manager that has no plugins.
+    """
+    name = "null"
+
+    def __init__(self, plugins=(), config={}):
+        self.__plugins = ()
+
+    def __iter__(self):
+        return ()
+
+    def addPlugin(self, plug):
+        raise NotImplementedError()
+
+    def addPlugins(self, plugins):
+        raise NotImplementedError()
+
+    def delPlugin(self, plug):
+        raise NotImplementedError()
+
+    def delPlugins(self, plugins):
+        raise NotImplementedError()
+
+    def getPlugins(self, name=None, interface=None):
+        return ()
+
+    def _get_plugins(self):
+        return self.__plugins
+
+    plugins = property(_get_plugins, None, None,
+                       """Access the list of plugins managed by
+                       this plugin manager""")
+
+class BuiltinPluginManager(PluginManager):
+    """Plugin manager that loads plugins from the list in L{builtin}.
+    """
+    name = "builtin"
+
+    def loadPlugins(self):
+        """Load plugins in L{builtin}.
+        """
+        from pkg.plugins import builtin
+        for plug in builtin.plugins:
+            self._loadPlugin(plug())
+
+
+class EntryPointPluginManager(PluginManager):
+    """Plugin manager that loads plugins from entrypoints.
+    """
+    name = "entrypoint"
+
+    def __init__(self, plugins=(), config={}):
+        self.entrypoints = config.get("entrypoints", ("pkg.plugins",))
+        PluginManager.__init__(self, plugins, config)
+
+    def loadPlugins(self):
+        """Load plugins by iterating all entry points.
+        """
+        try:
+            from pkg_resources import iter_entry_points
+        except ImportError:
+            return
+        for entrypoint in self.entrypoints:
+            for ep in iter_entry_points(entrypoint):
+                try:
+                    plug = ep.load()
+                except KeyboardInterrupt:
+                    raise
+                except Exception, e:
+                    warn("Unable to load plugin %s: %s" % (ep, e), RuntimeWarning)
+                    continue
+                self._loadPlugin(plug())
+
+
+class DirectoryPluginManager(PluginManager):
+    """Plugin manager that loads plugins from plugin directories.
+    """
+    name = "directory"
+
+    def __init__(self, plugins=(), config={}):
+        default_directory = os.path.join(os.path.dirname(
+                                find_module("pkg")[1]), "pkg", "plugins")
+        self.directories = config.get("directories", (default_directory,))
+        PluginManager.__init__(self, plugins, config)
+
+    def loadPlugins(self):
+        """Load plugins by iterating files in plugin directories.
+        """
+        plugins = []
+        for dir in self.directories:
+            try:
+                for f in os.listdir(dir):
+                    if f.endswith(".py") and f != "__init__.py":
+                        plugins.append((f[:-3], dir))
+            except OSError:
+                log.warn("Failed to access: %s", dir)
+                continue
+
+        fh = None
+        mod = None
+        for (name, dir) in plugins:
+            try:
+                acquire_lock()
+                fh, filename, desc = find_module(name, [dir])
+                old = sys.modules.get(name)
+                if old is not None:
+                    # make sure we get a fresh copy of anything we are trying
+                    # to load from a new path
+                    del sys.modules[name]
+                mod = load_module(name, fh, filename, desc)
+            finally:
+                if fh:
+                    fh.close()
+                release_lock()
+            if hasattr(mod, "__all__"):
+                attrs = [getattr(mod, x) for x in mod.__all__]
+                for plug in attrs:
+                    if not issubclass(plug, Plugin):
+                        continue
+                    self._loadPlugin(plug())
+
+
+class ShellPluginManager(PluginManager):
+    """Plugin manager that loads shell script plugins from plugin directories.
+    """
+    name = "shell"
+
+    info_begin_re = re.compile(r"^### BEGIN PLUGIN INFO\s*$")
+    info_end_re = re.compile(r"^### END PLUGIN INFO\s*$")
+    info_line_re = re.compile(r"^# (?P<key>[^\s:]+):\s*(?P<value>.*\S)\s*$")
+    info_line_plugin_version_re = re.compile(r"^# plugin_version:\s*(?P<value>.*\S)\s*$")
+    info_line_required_api_version_re = re.compile(r"^# required_api_version:\s*(?P<value>.*\S)\s*$")
+    info_line_conf_re = re.compile(r"^# configuration\s+(?P<key>[^\s:]+):\s*"
+                                    "(?P<value>.*\S)\s*$")
+    info_line_cont_re = re.compile(r"^#(\t|  )\s*(?P<cont>.*)$")
+
+    def __init__(self, plugins=(), config={}):
+        default_directory = os.path.join(os.path.dirname(
+                                find_module("pkg")[1]), "pkg", "plugins")
+        self.directories = config.get("directories", (default_directory,))
+        PluginManager.__init__(self, plugins, config)
+
+    def _get_version(self, value):
+        """Change the dot separated string version to tuple.
+        """
+        version = []
+        index = 0
+        for val in value.split("."):
+            if index > 4:
+                break
+            if index == 3:
+                if val in ['alpha', 'beta', 'candidate', 'final']:
+                    version.append(val)
+                else:
+                    log.warn("Invalide releaselevel: %s" % e)
+                    return
+            else:
+                try:
+                    version.append(int(val))
+                except TypeError, e:
+                    log.warn("Invalide version: %s" % e)
+                    return
+            index += 1
+        return tuple(version)
+
+    def _parse(self, file):
+        fd = open(file)
+        plug = Plugin()
+        info_begin = False
+        key = None
+        value = None
+        syntax_error = False
+        # FIXME: Plugin.configuration is a class variable and in mutable type.
+        # So we need bind it to the local namespace first to avoid affecting
+        # other subclasses.
+        plug.configuration = {}
+        for line in fd:
+            if not line.startswith("#"):
+                if not info_begin:
+                    continue
+                else:
+                    syntax_error = True
+                    log.warn("Parse error: %s", line)
+                    break
+            if self.info_begin_re.match(line):
+                info_begin = True
+                continue
+            if info_begin:
+                if self.info_end_re.match(line):
+                    break
+                m = self.info_line_plugin_version_re.match(line)
+                if m:
+                    value = m.group("value")
+                    version = self._get_version(value)
+                    if not version:
+                        syntax_error = True
+                        break
+                    setattr(plug, "plugin_version", version)
+                    continue
+                m = self.info_line_required_api_version_re.match(line)
+                if m:
+                    value = m.group("value")
+                    version = self._get_version(value)
+                    if not version:
+                        syntax_error = True
+                        break
+                    setattr(plug, "required_api_version", version)
+                    continue
+                m = self.info_line_re.match(line)
+                if m:
+                    key = m.group("key")
+                    value = m.group("value")
+                    setattr(plug, key, value)
+                    continue
+                m = self.info_line_conf_re.match(line)
+                if m:
+                    key = m.group("key")
+                    value = m.group("value")
+                    plug.configuration[key] = value
+                    continue
+                m = self.info_line_cont_re.match(line)
+                if m:
+                    value = " ".join((value, m.group("cont")))
+                    if key in plug.configuration:
+                        plug.configuration[key] = value
+                    elif key in dir(plug):
+                        setattr(plug, key, value)
+                    else:
+                        syntax_error = True
+                        log.warn("Parse error: %s", line)
+                        break
+                    continue
+                # exception found
+                syntax_error = True
+                log.warn("Parse error: %s", line)
+                break
+        fd.close()
+        # name and interface are required
+        if not syntax_error and plug.name and plug.interface:
+            return plug
+
+    def loadPlugins(self):
+        """Load plugins by iterating shell script files in plugin directories.
+        """
+        for dir in self.directories:
+            try:
+                file_list = os.listdir(dir)
+            except OSError, e:
+                log.warn("Failed to list dir: %s" % e)
+                continue
+            for f in os.listdir(dir):
+                plug = self._parse(os.path.join(dir, f))
+                if not plug:
+                    continue
+                self._loadPlugin(plug)
+
+
+class DefaultPluginManager(BuiltinPluginManager, EntryPointPluginManager,
+                           DirectoryPluginManager, ShellPluginManager):
+    """Plugin manager that try to load as many plugins as possible.
+    """
+    name = "default"
+
+    def __init__(self, plugins=(), config={}):
+        BuiltinPluginManager.__init__(self, plugins, config)
+        EntryPointPluginManager.__init__(self, plugins, config)
+        DirectoryPluginManager.__init__(self, plugins, config)
+        ShellPluginManager.__init__(self, plugins, config)
+
+    def loadPlugins(self):
+        BuiltinPluginManager.loadPlugins(self)
+        EntryPointPluginManager.loadPlugins(self)
+        DirectoryPluginManager.loadPlugins(self)
+        ShellPluginManager.loadPlugins(self)
+
+
+__inst = None
+__inst_lock = threading.Lock()
+
+def instance():
+    """Singleton constructor.
+    """
+    global __inst
+    global __inst_lock
+    __inst_lock.acquire()
+    try:
+        if __inst is None:
+            __inst = DefaultPluginManager()
+            __inst.loadPlugins()
+        return __inst
+    finally:
+        __inst_lock.release()
