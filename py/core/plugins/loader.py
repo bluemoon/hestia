@@ -1,5 +1,6 @@
 from container_singleton import Singleton
 from container_obj import ObjectProxy
+from import_default import default_import_manager
 from helpers import *
 
 import helpers
@@ -19,10 +20,10 @@ class loader(Singleton):
         self.module_classes = {}
         self.module_functions = {}
         self.class_instances = {}
-        self.__plugins = None
+        self.__imports = default_import_manager()
         
     def __repr__(self):
-        return ("<Loader for %s>" % (self.__plugins))
+        return ("<Loader for %s>" % (self.__imports))
     
     @property
     def get_modules(self):

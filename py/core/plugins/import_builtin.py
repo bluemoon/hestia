@@ -1,13 +1,7 @@
-from import_base import PluginManager
+from import_base import ImportBase
 
-class BuiltinPluginManager(PluginManager):
-    """Plugin manager that loads plugins from the list in L{builtin}.
-    """
-    name = "builtin"
-
+class BuiltinPluginManager(ImportBase):
     def loadPlugins(self):
-        """Load plugins in L{builtin}.
-        """
         import builtin_plugins
-        for plug in builtin_plugins.plugins:
-            self._loadPlugin(plug())
+        for i in builtin_plugins.imports:
+            self.add_import(i)

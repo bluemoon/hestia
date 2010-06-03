@@ -1,6 +1,6 @@
 from container_singleton import Singleton
 
-class ImportManager(Singleton):
+class ImportBase(Singleton):
     name = "base"
     def __init__(self, imports=(), config={}):
         self.__imports = []
@@ -10,8 +10,8 @@ class ImportManager(Singleton):
     def __iter__(self):
         return iter(self.imports)
 
-    def add_import(self, plug):
-        self.__imports.append(plug)
+    def add_import(self, im):
+        self.__imports.append(im)
 
     def add_imports(self, imports):
         for plug in imports:
