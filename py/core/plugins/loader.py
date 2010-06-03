@@ -23,7 +23,7 @@ class loader(Singleton):
         self.class_instances = {}
 
         if manager is None:
-            manager = helpers.instance(
+            manager = helpers.instance()
             
         plugins = manager.getPlugins()
         self.__plugins = plugins
