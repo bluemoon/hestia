@@ -5,7 +5,7 @@ import os
 class TestLoader(unittest.TestCase):
     def setUp(self):
         self.loader = loader.loader()
-
+        
     def test_has_attr_class(self):
         assert hasattr(self.loader, 'module_classes')
 

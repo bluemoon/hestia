@@ -13,8 +13,6 @@ LOG_FILENAME = 'loader.log'
 logging.raiseExceptions = False
 logging.basicConfig(filename=LOG_FILENAME, level=logging.DEBUG)
 
-
-
 class loader(Singleton):
     def __init__(self, manager=None):
         self.modules = {}
@@ -26,6 +24,7 @@ class loader(Singleton):
             manager = helpers.instance()
             
         plugins = manager.getPlugins()
+        print plugins
         self.__plugins = plugins
         
     def __repr__(self):
@@ -97,8 +96,8 @@ class loader(Singleton):
             if inspect.isfunction(each[1]):
                 self.module_functions[module] = each
 
-        print self.module_classes
-        print self.module_functions
-        print self.class_instances
+        #print self.module_classes
+        #print self.module_functions
+        #print self.class_instances
     
         
