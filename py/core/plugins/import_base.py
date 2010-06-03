@@ -10,6 +10,12 @@ class ImportBase(Singleton):
     def __iter__(self):
         return iter(self.imports)
 
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+    
     def add_import(self, im):
         self.__imports.append(im)
 
@@ -50,8 +56,8 @@ class ImportBase(Singleton):
             self.add_import(plug)
             log.debug("%s: loaded plugin %s implement %s", self.name, plug.name, plug.interface)
 
-    def load_imports(self):
-        pass
+    #def load_imports(self):
+    #    pass
 
     def _get_imports(self):
         return self.__imports

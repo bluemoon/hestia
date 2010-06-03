@@ -1,16 +1,21 @@
-plugins = []
+global imports
 builtins = (
-    ("monitoring.gnome_monitoring"),
-    )
+    ("py.monitoring.monitor"),    
+)
+
 
 imports = []
 for module in builtins:
     try:
-        plug_module = __import__(module, globals(), locals(), [])
-        imports.append(plug_module)
-        
+        loaded_module = __import__(module, globals(), locals(), [])
+        for i in module.split(".")[1:]:
+            loaded_module = getattr(loaded_module, i)
+        imports.append(loaded_module)
+
     except KeyboardInterrupt:
         raise
-    except:
+
+    except Exception, E:
+        print E
         continue
-    
+

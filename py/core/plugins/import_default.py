@@ -4,12 +4,9 @@ from import_base         import ImportBase
 from container_singleton import Singleton
 
 
-class default_import_manager(ImportBase):
-    def __init__(self):
-        ImportBase.__init__()
-        self.builtin = import_builtin()
-
+class default_import_manager(import_builtin):
     def load_imports(self):
+        self.builtin = import_builtin()
         self.builtin.load_imports()
 
 """

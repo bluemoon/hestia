@@ -10,9 +10,11 @@ import inspect
 import sys
 import imp
 
+import __builtin__
 LOG_FILENAME = 'loader.log'
 logging.raiseExceptions = False
 logging.basicConfig(filename=LOG_FILENAME, level=logging.DEBUG)
+__builtin__.default_manager = default_import_manager()
 
 class loader(Singleton):
     def __init__(self, manager=None):
@@ -20,7 +22,12 @@ class loader(Singleton):
         self.module_classes = {}
         self.module_functions = {}
         self.class_instances = {}
-        self.__imports = default_import_manager()
+        
+        default = default_import_manager()
+        default.setUp()
+        default.load_imports()
+        self.__imports = default.imports
+        print "imports: ", self.__imports
         
     def __repr__(self):
         return ("<Loader for %s>" % (self.__imports))

@@ -13,7 +13,7 @@ import sys
 import time
 import dbus
 
-global options
+#global options
 
 DEFAULT_CMD = "nosetests"
 APP_NAME = "Notifier"
@@ -27,12 +27,12 @@ except:
 
 
 
-parser = OptionParser()
-parser.add_option("--directory",    action="store",  dest="directory", default=os.getcwd())
-parser.add_option("--cmd",    action="store",  dest="cmd", default=DEFAULT_CMD)
-parser.add_option("--applet", action="store_true", dest="applet", default=False)
-parser.add_option("--applet_debug", action="store_true", dest="applet_debug", default=False)
-options, args = parser.parse_args()
+#parser = OptionParser()
+#parser.add_option("--directory",    action="store",  dest="directory", default=os.getcwd())
+#parser.add_option("--cmd",    action="store",  dest="cmd", default=DEFAULT_CMD)
+#parser.add_option("--applet", action="store_true", dest="applet", default=False)
+#parser.add_option("--applet_debug", action="store_true", dest="applet_debug", default=False)
+#options, args = parser.parse_args()
 
 class Monitoring(ProcessEvent):
     def my_init(self, options=None):
@@ -70,7 +70,6 @@ class Monitoring(ProcessEvent):
 
     def process_default(self, event):
         print 'default: ', event.maskname
-
 
 
 class MonitorTray:
@@ -125,8 +124,7 @@ class MonitorTray:
 
     def set_icon(self, path):
         self.statusIcon.set_from_file(path)
-
-
+        
     def execute_cb(self, widget, event, data = None):
         window = gtk.Window(gtk.WINDOW_TOPLEVEL)
         window.set_border_width(10)
@@ -162,8 +160,5 @@ class main:
         wm.add_watch(options.directory, IN_MODIFY, rec=True)
         notifier.loop()
 
-if __name__ == "__main__":
-    main_c = main()
-    main_c.main() 
 
 
