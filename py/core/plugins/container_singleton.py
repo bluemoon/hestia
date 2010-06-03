@@ -13,3 +13,4 @@ class Singleton(object):
             
         return cls._inst
     
+ 

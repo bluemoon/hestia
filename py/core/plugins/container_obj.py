@@ -14,7 +14,7 @@ class Obj(object):
             else:
                setattr(self, key, Obj(value) if isinstance(value, dict) else value)
                
-
+ 
 class ObjectProxy(object):
     def __init__(self, constructor=None):
         self.__con = constructor
