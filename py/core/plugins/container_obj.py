@@ -24,8 +24,6 @@ class ObjectProxy(object):
         return '<ObjectProxy %s>' % repr(self.__d)
     
     def __getattr__(self, attr):
-        #log(attr)
-        #log(repr(self.__dict__))
         try:
             return dict.__getattr__(self, attr)
         except:

@@ -22,9 +22,6 @@ for module in builtins:
 
 
 class import_builtin(ImportBase):
-    #def init(self):
-    #    ImportBase.__init__(self)
-        
     def load_imports(self):
         for i in imports:
             self.add_import(i)

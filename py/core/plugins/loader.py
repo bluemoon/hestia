@@ -14,7 +14,6 @@ import __builtin__
 LOG_FILENAME = 'loader.log'
 logging.raiseExceptions = False
 logging.basicConfig(filename=LOG_FILENAME, level=logging.DEBUG)
-__builtin__.default_manager = default_import_manager()
 
 class loader(Singleton):
     def __init__(self, manager=None):
@@ -27,7 +26,6 @@ class loader(Singleton):
         default.load_imports()
         self.__imports = default.imports
         self.process_imports()
-        #print "imports: ", self.__imports
 
     def process_imports(self):
         for module in self.__imports:
