@@ -23,6 +23,9 @@ class TestLoader(unittest.TestCase):
 
     def test_get_modules(self):
         assert self.loader.get_modules
+        
+    def test_get_classes(self):
+        assert self.loader.get_classes
 
     def test_get_class_instances(self):
         assert self.loader.get_class_instances

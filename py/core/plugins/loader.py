@@ -31,7 +31,7 @@ class loader(Singleton):
 
     @property
     def get_classes(self):
-        return self.classes
+        return self.module_classes
     
     @property
     def get_class_instances(self):

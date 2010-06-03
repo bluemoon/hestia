@@ -9,7 +9,6 @@ all:
 install:
 	$(PYTHON) setup.py install --skip-build
 
-
 test:
 	nosetests --with-coverage --cover-package=py -v
 
