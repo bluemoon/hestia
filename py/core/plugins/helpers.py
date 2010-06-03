@@ -3,6 +3,7 @@ from import_default import DefaultPluginManager
 
 import inspect
 import traceback
+import logging
 
 def current():
     return inspect.stack()[1][3]
