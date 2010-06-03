@@ -15,6 +15,9 @@ class ImportBase(Singleton):
 
     def tearDown(self):
         pass
+
+    def load_imports(self):
+        pass
     
     def add_import(self, im):
         self.__imports.append(im)
