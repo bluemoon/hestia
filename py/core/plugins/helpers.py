@@ -1,5 +1,15 @@
 from multiprocessing import Lock
-from manager_default import DefaultPluginManager
+from import_default import DefaultPluginManager
+from loader import loader
+import inspect
+
+def current():
+    return inspect.stack()[1][3]
+def parent():
+    return inspect.stack()[2][3]
+def log(data):
+    Stack = inspect.stack()[1]
+    logging.debug("%d %s: %s" % (Stack[2], os.path.split(Stack[1])[1], data))
 
 class _Method:
     """Some magic to bind a method to a plugin.

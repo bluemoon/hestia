@@ -1,21 +1,13 @@
-"""
-List of builtin plugins.
-"""
-
 plugins = []
 builtins = (
-#    ("plugins.network_bridged", "NetworkBridged"),
-#    ("plugins.storage_directory", "StorageDirectory"),
-#    ("plugins.storage_iscsi", "StorageISCSI"),
+    ("monitoring.gnome_monitoring"),
     )
 
-for module, cls in builtins:
+for module in builtins:
     try:
-        plugmod = __import__(module, globals(), locals(), [cls])
+        plug_module = __import__(module, globals(), locals(), [])
     except KeyboardInterrupt:
         raise
     except:
         continue
-    plug = getattr(plugmod, cls)
-    plugins.append(plug)
-    globals()[cls] = plug
+    

@@ -294,7 +294,7 @@ class plugin:
                     exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()
                     print "*** print_tb:"
                     traceback.print_tb(exceptionTraceback, file=sys.stdout)
-
+                    
                     print "Class attempt 1:", e
                     print "module_name:", module_name
                     print "class_name:", class_name

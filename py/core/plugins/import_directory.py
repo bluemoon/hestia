@@ -1,4 +1,4 @@
-from manager_base import PluginManager
+from import_base import PluginManager
 
 import os
 

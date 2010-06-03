@@ -2,4 +2,7 @@ import unittest
 import loader_basic
 
 class TestLoaderBasic(unittest.TestCase):
-    pass
+    def setUp(self):
+        self.loader = loader_basic.loader_basic()
+    def test1(self):
+        pass

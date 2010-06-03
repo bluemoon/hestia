@@ -1,7 +1,4 @@
 class PluginManager(object):
-    """Base class for plugin managers. Does not implement loadPlugins, so it
-    may only be used with a static list of plugins.
-    """
     name = "base"
 
     def __init__(self, plugins=(), config={}):
@@ -27,24 +24,27 @@ class PluginManager(object):
         for plug in plugins:
             self.delPlugin(plug)
 
-    def getPlugins(self, interface=None, name=None):
+    def getPlugins(self, name=None):
         plugins = []
         for plugin in self.__plugins:
-            if (interface is None or plugin.interface == interface) and \
-               (name is None or plugin.name == name):
+            if (name is None or plugin.name == name):
                 plugins.append(plugin)
+                
         return plugins
 
     def _loadPlugin(self, plug):
+        if not hasattr(plug, 'required_api_version'):
+            return
         if plug.required_api_version > pkg.plugins.interface.IPlugin.version:
             log.warn("version dismatch: requires %s", plug.required_api_version)
             return
+        
         loaded = False
         for p in self.plugins:
-            if p.name == plug.name and \
-                p.interface == plug.interface:
+            if p.name == plug.name:
                 loaded = True
                 break
+            
         if not loaded:
             self.addPlugin(plug)
             log.debug("%s: loaded plugin %s implement %s", self.name, plug.name, plug.interface)
