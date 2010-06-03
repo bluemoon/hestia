@@ -12,8 +12,6 @@ LOG_FILENAME = 'loader.log'
 logging.raiseExceptions = False
 logging.basicConfig(filename=LOG_FILENAME, level=logging.DEBUG)
 
-def log_traceback():
-    logging.debug(repr(traceback.format_exc()))
 
 
 class loader(Singleton):
