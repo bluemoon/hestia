@@ -4,6 +4,9 @@ import inspect
 import __builtin__
 __builtin__.instance = {}
 
+class SingletonException(Exception):
+    pass
+
 def init_pass(self, *dt, **mp):
     pass
 
@@ -15,8 +18,6 @@ class Singleton(object):
             cls._inst_lock = Lock()
             cls._inst = super(Singleton, cls).__new__(cls)
         else:
-
-            
             cls.__init__ = init_pass
             
         return cls._inst
@@ -29,4 +30,22 @@ class Singleton2(object):
             Singleton2.__instance = obj
             
         return Singleton2.__instance
+
+class Singleton3(object):
+    def __new__(cls, *args, **kwds):
+        it = cls.__dict__.get("__it__")
+        if it is not None:
+            return it
+        cls.__it__ = it = object.__new__(cls)
+        it.init(*args, **kwds)
+        return it
  
+    def init(self, *args, **kwds):
+        pass
+    
+class MetaSingleton(type):
+    instance = None
+    def __call__(cls, *args, **kw):
+        if cls.instance is None:
+            cls.instance = super(MetaSingleton, cls).__call__(*args, **kw)
+        return cls.instance

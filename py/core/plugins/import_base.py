@@ -1,7 +1,7 @@
-from container_singleton import Singleton
+from container_singleton import *
+from helpers import *
 
-class ImportBase(Singleton):
-    name = "base"
+class ImportBase(Singleton3):
     def __init__(self, imports=(), config={}):
         self.__imports = []
         if imports:
@@ -16,9 +16,6 @@ class ImportBase(Singleton):
     def tearDown(self):
         pass
 
-    def load_imports(self):
-        pass
-    
     def add_import(self, im):
         self.__imports.append(im)
 
@@ -70,6 +67,12 @@ class ImportBase(Singleton):
         self.add_imports(plugins)
 
     imports = property(_get_imports, _set_imports)
+
+    #def __getattr__(self, attr):
+    #    try:
+    #        return self.__dict__[attr]
+    #    except:
+    #        print ImportBase.__subclasses__()
 
 
 class PluginManager(object):

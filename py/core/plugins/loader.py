@@ -24,11 +24,15 @@ class loader(Singleton):
         self.class_instances = {}
         
         default = default_import_manager()
-        default.setUp()
         default.load_imports()
         self.__imports = default.imports
-        print "imports: ", self.__imports
-        
+        self.process_imports()
+        #print "imports: ", self.__imports
+
+    def process_imports(self):
+        for module in self.__imports:
+            self.process_module(module)
+            
     def __repr__(self):
         return ("<Loader for %s>" % (self.__imports))
     
@@ -64,6 +68,19 @@ class loader(Singleton):
         else:
             return False
         
+    def process_module(self, module):
+        members = inspect.getmembers(module)
+        self.module_classes[module] = {}
+        self.module_functions[module] = {}
+        self.class_instances[module] = {}
+        
+        for each in members:
+            if inspect.isclass(each[1]):
+                self.module_classes[module] = each
+                self.class_instances[module][each[0]] = self.load_class(each[1])
+            if inspect.isfunction(each[1]):
+                self.module_functions[module] = each
+                
     def load_module(self, module, location=None):
         local_module = self.get_module(module)
         system_module = self.system_loaded_module(module)
@@ -81,17 +98,7 @@ class loader(Singleton):
 
             self.modules[module] = loaded_module
             
-        members = inspect.getmembers(self.modules[module])
-        self.module_classes[module] = {}
-        self.module_functions[module] = {}
-        self.class_instances[module] = {}
-        
-        for each in members:
-            if inspect.isclass(each[1]):
-                self.module_classes[module] = each
-                self.class_instances[module][each[0]] = self.load_class(each[1])
-            if inspect.isfunction(each[1]):
-                self.module_functions[module] = each
+        self.process_module(self.modules[module])
 
         #print self.module_classes
         #print self.module_functions

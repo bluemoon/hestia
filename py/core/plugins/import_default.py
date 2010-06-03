@@ -1,13 +1,12 @@
 from import_builtin      import import_builtin
 from import_base         import ImportBase
 
-from container_singleton import Singleton
-
-
 class default_import_manager(import_builtin):
+    def init(self):
+        import_builtin.init(self)
+        
     def load_imports(self):
-        self.builtin = import_builtin()
-        self.builtin.load_imports()
+        import_builtin.load_imports(self)
 
 """
 class DefaultPluginManager(BuiltinPluginManager):

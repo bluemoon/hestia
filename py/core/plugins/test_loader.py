@@ -20,6 +20,9 @@ class TestLoader(unittest.TestCase):
 
     def test_repr(self):
         print self.loader
+        print self.loader.module_classes
+        print self.loader.module_functions
+        print self.loader.class_instances
 
     def test_get_modules(self):
         assert self.loader.get_modules

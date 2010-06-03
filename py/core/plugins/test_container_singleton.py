@@ -41,3 +41,4 @@ class TestContainerSingleton(unittest.TestCase):
         
         self.assertTrue(d2.x == 5)
         self.assertTrue(d1.x == 5)
+        self.assertEquals(id(d1), id(d2))
