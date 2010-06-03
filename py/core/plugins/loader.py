@@ -19,13 +19,7 @@ class loader(Singleton):
         self.module_classes = {}
         self.module_functions = {}
         self.class_instances = {}
-
-        if manager is None:
-            manager = helpers.instance()
-            
-        plugins = manager.getPlugins()
-        print plugins
-        self.__plugins = plugins
+        self.__plugins = None
         
     def __repr__(self):
         return ("<Loader for %s>" % (self.__plugins))
@@ -44,7 +38,7 @@ class loader(Singleton):
 
     @property
     def get_function(self):
-        return self
+        return self.module_functions
     
 
     def get_module(self, module):
@@ -69,19 +63,14 @@ class loader(Singleton):
             try:
                 file, pathname, description = imp.find_module(module)
                 loaded_module = imp.load_module(name, file, pathname, description)
-                if file:
-                    file.close()
+                file.close()
+                
             except Exception, E:
-                logging.debug("imp failed to find the module")
-                log_traceback()
                 try:
                     loaded_module = __import__(module, globals(), locals(), [], -1)
                 except Exception, E2:
-                    logging.debug("__import__ failed")
-                    log_traceback()
-                    return
-                    
-                    
+                    raise ImportError
+
             self.modules[module] = loaded_module
             
         members = inspect.getmembers(self.modules[module])

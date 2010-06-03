@@ -24,4 +24,6 @@ class TestObj(unittest.TestCase):
         self.assertTrue(uni.a.b.d == 6)
         self.assertTrue(uni.a.b.c == 3)
 
-        #pass
+    def test_object_proxy_repr(self):
+        obj = container_obj.ObjectProxy()
+        self.assertTrue(repr(obj).startswith('<ObjectProxy'))

@@ -1,4 +1,6 @@
-class ImportManager(object):
+from container_singleton import Singleton
+
+class ImportManager(Singleton):
     name = "base"
     def __init__(self, imports=(), config={}):
         self.__imports = []

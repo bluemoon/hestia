@@ -1,5 +1,18 @@
+PYTHON=python2.6
+
+.PHONY: all install clean
+
+all:
+	$(PYTHON) setup.py build
+	nosetests -v
 
 install:
-	python setup.py install
+	$(PYTHON) setup.py install --skip-build
+
+
 test:
-	nosetests --with-coverage --cover-package=py
+	nosetests --with-coverage --cover-package=py -v
+
+clean:
+	$(PYTHON) setup.py clean
+	rm -rf build
