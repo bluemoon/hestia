@@ -1,5 +1,6 @@
 from container_singleton import Singleton
 from container_obj import ObjectProxy
+from helpers import *
 
 import helpers
 import logging
