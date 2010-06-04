@@ -3,8 +3,8 @@ import imp
 import sys
 
 builtins = (
-    #("monitoring.monitor"),
-    #("gui.gtk"),
+    ("hestia.monitoring.monitor"),
+    ("hestia.gui.gtk"),
 )
 
 imports = []

@@ -44,7 +44,9 @@ class Main:
         Simple(self.loader).cmdloop()
 
 
-
-if __name__ == "__main__":
+def main():
     main = Main()
     main.main()
+    
+if __name__ == "__main__":
+    main()

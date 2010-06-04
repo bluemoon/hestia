@@ -1,5 +1,5 @@
 import sys
-import core.plugins.pattern_threaded as threaded
+import hestia.core.plugins.pattern_threaded as threaded
 
 class basic_monitor(threaded.threading_pattern):
     def __init__(self):

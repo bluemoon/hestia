@@ -4,7 +4,7 @@ PYTHON=python2.6
 
 all:
 	$(PYTHON) setup.py build
-	nosetests -sv -P
+	nosetests -sv py
 
 install:
 	$(PYTHON) setup.py install --skip-build
