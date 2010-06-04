@@ -1,19 +1,26 @@
 from multiprocessing import Process, Queue, Pipe, Lock
+from hestia.core.plugins.scheduler import *
 import multiprocessing
 from loader import loader
 from helpers import *
 import inspect
 import time
 import sys
-     
+
+def handle(message):
+    print "[%s] MESSAGE: %s" % (time.time(), message) 
+
 class loader_threaded(loader):
     def init(self, manager=None):
-        #loader.__init__(self, manager)
         self.__Queues     = {}
         self.__Pipes      = {}
         self.__Processes  = {}
         self.__Lock       = {}
         
+        self.sched_queue   = Queue()
+        self.sched         = Scheduler(self.sched_queue, handle) 
+        self.sched_process = Process(target=self.sched.run, args=())
+        self.sched_process.start()
         
     def send_all(self, msg):
         for k, v in self.__Pipes.items():
@@ -46,12 +53,10 @@ class loader_threaded(loader):
     def load_class(self, module, class_object):
         module_name = module.__name__
         parent, child = Pipe()
-        #class_object.__bases__ = (threading_pattern,) + class_object.__bases__
-        instance = class_object()
         parent_queue = Queue()
         lock = Lock()
-        
-        ##instance.setUp(child, parent_queue)
+        print class_object
+        instance = class_object(child=child, parent=parent_queue)
         self.__set_internal_data(module_name)
         
         self.__Queues[module_name][class_object.__name__] = parent_queue
@@ -62,7 +67,5 @@ class loader_threaded(loader):
         process = Process(target=instance.run, args=(lock, child, parent_queue))
         self.__Processes[module_name][class_object.__name__] = process
         process.start()
-
-        #parent.send(time.time())
         
 

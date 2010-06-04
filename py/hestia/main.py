@@ -1,4 +1,5 @@
 from core.plugins.loader_threaded import *
+
 import cmd
 import sys
 import time
@@ -20,10 +21,9 @@ class Simple(cmd.Cmd):
         #print self.loader.get_queue('monitoring.monitor', 'basic_monitor')
 
     def do_msg(self, line):
-        self.loader.send_all(line)
-        #while not self.loader.poll_pipe('monitoring.monitor', 'basic_monitor'):
-        #    pass
-        print self.loader.get_queue('monitoring.monitor', 'basic_monitor')
+        pieces = line.split(' ')
+        self.loader.send(pieces[0], pieces[1], pieces[2])
+        print self.loader.get_queue(pieces[0], pieces[1])
         
     def do_exit(self, line):
         self.loader.send_all('quit')
@@ -39,6 +39,7 @@ class Simple(cmd.Cmd):
 class Main:
     def __init__(self):
         self.loader = loader_threaded()
+
         
     def main(self):
         Simple(self.loader).cmdloop()

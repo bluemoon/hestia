@@ -5,6 +5,8 @@ setup(
     packages = find_packages('py'),
     package_dir = {'':'py'},
     data_files = [ ("share/notifier/icons", ['data/24-em-check.png','data/24-em-cross.png']) ],
+    zip_safe=False,
+    license='GPL',
     author='Alex Toney',
     author_email='toneyalex@gmail.com',
     entry_points = {

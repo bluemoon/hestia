@@ -1,24 +1,33 @@
 import sys
 import inspect
+import time
 
 class threading_pattern:
-    def setUp(self, child_connection, parent_queue):
-        self.__child_connection = child_connection
-        self.__parent_queue = parent_queue
-        
+    def __init__(self, child=None, parent=None):
+        self.child_connection = child
+        self.parent_queue     = parent
+
+    def main(self):
+        pass
+    
     def run(self, lock, child_connection, parent_queue):
+        self.child_connection = child_connection
+        self.lock = lock
+        self.parent_queue = parent_queue
+        #self.main()
         keep_running = True
         while keep_running:
-            if child_connection.poll():
-                msg = child_connection.recv()
+            time.sleep(0.12)
+            if self.child_connection.poll():
+                msg = self.child_connection.recv()
                 if msg == 'quit':
                     keep_running = False
                     sys.exit()
                 elif msg == 'dict':
-                    lock.acquire()
-                    parent_queue.put(self.__dict__)
-                    child_connection.send(self.__dict__)
-                    lock.release()
+                    self.lock.acquire()
+                    self.parent_queue.put(self.__dict__)
+                    self.child_connection.send(self.__dict__)
+                    self.lock.release()
                 else:
                     runner = getattr(self, msg)
                     if inspect.isfunction(runner):

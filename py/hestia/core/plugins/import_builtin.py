@@ -4,7 +4,7 @@ import sys
 
 builtins = (
     ("hestia.monitoring.monitor"),
-    ("hestia.gui.gtk"),
+    ("hestia.gui.gtk_gui"),
 )
 
 imports = []
