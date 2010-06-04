@@ -18,10 +18,9 @@ class Obj(object):
 class ObjectProxy(object):
     def __init__(self, constructor=None):
         self.__con = constructor
-        self.__d = {}
 
     def __repr__(self):
-        return '<ObjectProxy %s>' % repr(self.__d)
+        return '<ObjectProxy [%s]>' % ', '.join(self.__dict__.keys())
     
     def __getattr__(self, attr):
         try:
@@ -32,9 +31,6 @@ class ObjectProxy(object):
             return self.__dict__[attr]
         
     def __setattr__(self, attr, value):
-        #log(attr)
-        #log(value)
-        
         if self.__dict__.has_key(attr) or '__' in attr:
             dict.__setattr__(self, attr, value)
         else:

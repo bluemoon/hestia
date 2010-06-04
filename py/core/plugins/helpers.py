@@ -1,6 +1,8 @@
 import inspect
 import traceback
 import logging
+import os
+import fnmatch
 
 def current():
     return inspect.stack()[1][3]
@@ -58,3 +60,27 @@ def itersubclasses(cls, _seen=None):
                 
 def get_super_classes(cls):
     return [o[0] for o in inspect.getclasstree([cls]) if type(o[0]) == type]
+
+class _Method:
+    """Some magic to bind a method to a plugin.
+
+    Supports "nested" methods (e.g. examples.getStateName).
+    """
+    def __init__(self, plugin, name):
+        self.__plugin = plugin
+        self.__name = name
+
+    def __getattr__(self, name):
+        return _Method(self.__plugin, "%s.%s" % (self.__name, name))
+
+    def __call__(self, *args):
+        return self.__plugin(self.__name, *args)
+    
+def locate(pattern, root=os.getcwd()):
+    for path, dirs, files in os.walk(root):
+        for filename in [os.path.abspath(os.path.join(path, filename)) for filename in files if fnmatch.fnmatch(filename, pattern)]:
+            yield filename
+            
+def difference(a, b):
+    """ show whats in list b which isn't in list a """
+    return list(set(b).difference(set(a)))

@@ -1,2 +1,9 @@
 class example1:
-    pass
+    def init(self):
+        pass
+    
+    def print_t(self, i):
+        print i
+
+    def true(self):
+        return True

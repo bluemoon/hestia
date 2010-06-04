@@ -21,6 +21,7 @@ class loader(Singleton):
         self.module_classes = {}
         self.module_functions = {}
         self.class_instances = {}
+        self.proxy_objects = {}
         
         default = default_import_manager()
         default.load_imports()
@@ -33,6 +34,13 @@ class loader(Singleton):
             
     def __repr__(self):
         return ("<Loader for %s>" % (self.__imports))
+
+    def get_instance(self, name):
+        proxy_object = ObjectProxy()
+        for k, v in self.class_instances[name].items():
+            setattr(proxy_object, k, v)
+            
+        return proxy_object
     
     @property
     def get_modules(self):
@@ -57,27 +65,35 @@ class loader(Singleton):
         else:
             return False
         
-    def load_class(self, class_object):
-        return class_object()
-    
+    #def __getattr__(self, attr):
+    #    if attr in self.__dict__:
+    #        return self.__dict__[attr] 
+    #    elif attr in self.class_instances:
+    #        return self.class_instances[attr]
+            
+    def load_class(self, module, class_object):
+        self.class_instances[module.__name__][class_object.__name__] = class_object()
+
     def system_loaded_module(self, module):
         if sys.modules.has_key(module):
             return sys.modules[module]
         else:
             return False
         
+    
     def process_module(self, module):
         members = inspect.getmembers(module)
-        self.module_classes[module] = {}
-        self.module_functions[module] = {}
-        self.class_instances[module] = {}
+        module_name = module.__name__
+        self.module_classes[module_name] = {}
+        self.module_functions[module_name] = {}
+        self.class_instances[module_name] = {}
         
         for each in members:
             if inspect.isclass(each[1]):
-                self.module_classes[module] = each
-                self.class_instances[module][each[0]] = self.load_class(each[1])
+                self.module_classes[module_name] = each
+                self.load_class(module, each[1])
             if inspect.isfunction(each[1]):
-                self.module_functions[module] = each
+                self.module_functions[module_name] = each
                 
     def load_module(self, module, location=None):
         local_module = self.get_module(module)

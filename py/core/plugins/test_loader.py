@@ -16,13 +16,9 @@ class TestLoader(unittest.TestCase):
         
     def test_1_load_module(self):
         self.loader.load_module('example_plugin')
-        #assert False
 
     def test_repr(self):
-        print self.loader
-        print self.loader.module_classes
-        print self.loader.module_functions
-        print self.loader.class_instances
+        self.assertTrue(repr(self.loader).startswith('<Loader'))
 
     def test_get_modules(self):
         assert self.loader.get_modules
@@ -44,3 +40,8 @@ class TestLoader(unittest.TestCase):
 
     def test_load_module_fail(self):
         self.failUnlessRaises(ImportError, self.loader.load_module, 'gidjgiajd')
+
+    def test_get_instance(self):
+        t = self.loader.get_instance('py.core.plugins.example_plugin')
+        self.assertTrue(t.example1.true() == True)
+
