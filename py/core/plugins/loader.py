@@ -1,4 +1,4 @@
-from container_singleton import Singleton
+from container_singleton import *
 from container_obj import ObjectProxy
 from import_default import default_import_manager
 from helpers import *
@@ -15,7 +15,7 @@ LOG_FILENAME = 'loader.log'
 logging.raiseExceptions = False
 logging.basicConfig(filename=LOG_FILENAME, level=logging.DEBUG)
 
-class loader(Singleton):
+class loader(Singleton3):
     def __init__(self, manager=None):
         self.modules = {}
         self.module_classes = {}
@@ -37,8 +37,11 @@ class loader(Singleton):
 
     def get_instance(self, name):
         proxy_object = ObjectProxy()
-        for k, v in self.class_instances[name].items():
-            setattr(proxy_object, k, v)
+        if self.class_instances.has_key(name):
+            for k, v in self.class_instances[name].items():
+                setattr(proxy_object, k, v)
+        else:
+            return
             
         return proxy_object
     

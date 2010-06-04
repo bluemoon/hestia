@@ -84,3 +84,9 @@ def locate(pattern, root=os.getcwd()):
 def difference(a, b):
     """ show whats in list b which isn't in list a """
     return list(set(b).difference(set(a)))
+
+def makedict(dictionary, attr):
+    if not isinstance(dictionary, dict):
+        dictionary[attr] = {}
+    return dictionary
+        

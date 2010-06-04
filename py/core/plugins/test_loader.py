@@ -13,7 +13,7 @@ class TestLoader(unittest.TestCase):
         new_loader = loader.loader()
         self.loader.module_classes['d'] = True
         assert self.loader.module_classes['d'] == new_loader.module_classes['d']
-        
+    """    
     def test_1_load_module(self):
         self.loader.load_module('example_plugin')
 
@@ -45,3 +45,4 @@ class TestLoader(unittest.TestCase):
         t = self.loader.get_instance('py.core.plugins.example_plugin')
         self.assertTrue(t.example1.true() == True)
 
+    """
