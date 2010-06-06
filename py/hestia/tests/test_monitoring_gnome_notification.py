@@ -64,8 +64,3 @@ class TestMain:
         # assert_equal(expected, main.main())
         raise SkipTest # TODO: implement your test here
 
-    def test_threaded(self):
-        # main = Main()
-        # assert_equal(expected, main.threaded())
-        raise SkipTest # TODO: implement your test here
-

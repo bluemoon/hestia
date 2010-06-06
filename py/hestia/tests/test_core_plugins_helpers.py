@@ -62,18 +62,3 @@ class TestMakedict:
         # assert_equal(expected, makedict(dictionary, attr))
         raise SkipTest # TODO: implement your test here
 
-class test__Method:
-    def test___call__(self):
-        # __method = _Method(plugin, name)
-        # assert_equal(expected, __method.__call__(*args))
-        raise SkipTest # TODO: implement your test here
-
-    def test___getattr__(self):
-        # __method = _Method(plugin, name)
-        # assert_equal(expected, __method.__getattr__(name))
-        raise SkipTest # TODO: implement your test here
-
-    def test___init__(self):
-        # __method = _Method(plugin, name)
-        raise SkipTest # TODO: implement your test here
-
