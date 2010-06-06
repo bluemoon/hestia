@@ -2,7 +2,6 @@ setup.cfg
 setup.py
 py/hestia/__init__.py
 py/hestia/main.py
-py/hestia/recompile.py
 py/hestia.egg-info/PKG-INFO
 py/hestia.egg-info/SOURCES.txt
 py/hestia.egg-info/dependency_links.txt
@@ -13,7 +12,9 @@ py/hestia/core/__init__.py
 py/hestia/core/api.py
 py/hestia/core/core.py
 py/hestia/core/event_driven.py
+py/hestia/core/gnome_monitor.py
 py/hestia/core/prompt.py
+py/hestia/core/recompile.py
 py/hestia/core/settings.py
 py/hestia/core/plugins/__init__.py
 py/hestia/core/plugins/dispatcher.py

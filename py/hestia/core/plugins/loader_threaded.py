@@ -25,7 +25,7 @@ class dispatch(Thread):
         instance = self.class_object(self.child, self.parent_queue, self.lock)
         log.debug(current_thread())
         instance.run()
-        log.debug("leaving run")
+        #log.debug("leaving run")
         
         
 class loader_threaded(loader):
@@ -100,7 +100,7 @@ class loader_threaded(loader):
         process.start()
         #process.join()
         #instance = class_object(child=child, parent=parent_queue)
-        log.debug("does this block?")
+        #log.debug("does this block?")
         self.class_instances[module.__name__][class_object.__name__] = instance
         #thread = threading.Thread(target=instance.run)        
         #process = Process(target=instance.run, args=(lock, child, parent_queue))

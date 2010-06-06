@@ -1,10 +1,9 @@
 import cmd
 
 class SimplePrompt(cmd.Cmd):
-    def __init__(self, loader):
+    def __init__(self):
         cmd.Cmd.__init__(self)
         self.prompt = 'hestia% '
-        self.loader = loader
         
     def do_greet(self, line):
         print "hello"

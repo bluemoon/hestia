@@ -3,11 +3,11 @@ PYTHON=python2.6
 .PHONY: all install clean
 
 all:
-	$(PYTHON) setup.py build
+	$(PYTHON) setup.py build -f
 	nosetests -sv py
 
 install:
-	$(PYTHON) setup.py install --skip-build
+	$(PYTHON) setup.py install 
 
 test:
 	nosetests --with-coverage --cover-package=py -v

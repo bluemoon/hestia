@@ -1,11 +1,12 @@
 #!/usr/bin/python
-from pyinotify   import *
 from subprocess  import PIPE, Popen, call
-from optparse    import OptionParser
-
+from hestia import *
+from circuits.core import Event, Component, Manager
+from circuits.core.handlers import handler
+from circuits.drivers._inotify import *
 import pygtk
 pygtk.require('2.0')
-import gtk
+
 import gc
 import gobject
 import os
@@ -13,17 +14,99 @@ import sys
 import time
 import dbus
 
+import logging
+
+try:
+    import gtk
+    gtk.gdk.threads_init()
+except:
+    pass
+
+
+try:
+    import pynotify
+    pynotify.init("Hestia")
+    PYNOTIFY = True 
+except:
+    PYNOTIFY = False
+
+ 
+class GtkStatusIcon(Component):
+    channel = "inotify"
+    def __tick__(self):
+        while gtk.events_pending():
+            gtk.main_iteration_do(block=True)
+
+    def __init__(self, directory):
+        super(GtkStatusIcon, self).__init__(channel=self.channel)
+
+        self.good_icon_path = '/usr/local/share/icons/hestia/24-em-check.png'#"/usr/local/share/notifier/icons/24-em-check.png"
+        self.bad_icon_path  = '/usr/local/share/icons/hestia/24-em-cross.png'#"/usr/local/share/notifier/icons/24-em-cross.png"
+
+        #self.timeout_source = gobject.timeout_add(self.timeout, self.timeout_callback)
+        self.statusIcon = gtk.StatusIcon()
+        
+        self.menu = gtk.Menu()
+        self.menuItem = gtk.ImageMenuItem(gtk.STOCK_EXECUTE)
+        self.menuItem.connect('activate', self.execute_cb, self.statusIcon)
+        self.menu.append(self.menuItem)
+        
+        self.menuItem = gtk.ImageMenuItem(gtk.STOCK_QUIT)
+        self.menuItem.connect('activate', self.quit_cb, self.statusIcon)
+        self.menu.append(self.menuItem)
+        
+        self.statusIcon.connect('popup-menu', self.popup_menu_cb, self.menu)
+        self.statusIcon.set_from_file(self.good_icon_path)
+        self.statusIcon.set_visible(1)
+        self.statusIcon.set_tooltip("Monitoring (%s)" % directory)
+        
+    @handler("returncode")
+    def on_returncode(self, *args):
+        status = args[0]
+        logging.debug(args)
+        if PYNOTIFY:
+            if pynotify.init("Hestia"):
+                n = pynotify.Notification("Build status", "build status: %d" % status)
+                if int(status) != 0:
+                    n.set_icon_from_pixbuf(gtk.gdk.pixbuf_new_from_file(self.bad_icon_path))
+                else:
+                    n.set_icon_from_pixbuf(gtk.gdk.pixbuf_new_from_file(self.good_icon_path))
+                    
+                n.set_timeout(0.8)
+                #n.set_urgency(pynotify.URGENCY_NORMAL)
+                #n.set_timeout(pynotify.EXPIRES_NEVER)
+                n.show()
+
+        if int(status) != 0:
+            self.set_icon(self.bad_icon_path)
+        else:
+            self.set_icon(self.good_icon_path)
+            
+        return True
+    
+    def quit_cb(self, *args):
+        self.stop()
+        
+    def execute_cb(self, widget, event, data = None):
+        self.push(Modified(['', '', '', False] ))
+        
+    def popup_menu_cb(self, widget, button, time, data = None):
+        if button == 3:
+            if data:
+                data.show_all()
+                data.popup(None, None, gtk.status_icon_position_menu,
+                           3, time, self.statusIcon)
+        
+    def set_icon(self, path):
+        self.statusIcon.set_from_file(path)
+    
+
 #global options
 
 DEFAULT_CMD = "nosetests"
 APP_NAME = "Notifier"
 
-try:
-    import pynotify
-    pynotify.init(APP_NAME)
-    PYNOTIFY = True
-except:
-    PYNOTIFY = False
+
 
 
 
@@ -34,6 +117,7 @@ except:
 #parser.add_option("--applet_debug", action="store_true", dest="applet_debug", default=False)
 #options, args = parser.parse_args()
 
+"""
 class Monitoring(ProcessEvent):
     def my_init(self, options=None):
         self.cmd    = options.cmd
@@ -161,4 +245,4 @@ class main:
         notifier.loop()
 
 
-
+"""
