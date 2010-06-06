@@ -1,7 +1,9 @@
 from multiprocessing import Process
+import logging as log
 import sys
 import inspect
 import time
+
 
 class threading_pattern:
     def __init__(self, child=None, parent=None):
@@ -15,16 +17,23 @@ class threading_pattern:
     def main(self):
         pass
     
+    def hook(self):
+        pass
+
+        
     def run(self, lock, child_connection, parent_queue):
+        #log.debug("starting up run from %s" % (super(threading_pattern, self)))
         self.child_connection = child_connection
         self.lock = lock
         self.parent_queue = parent_queue
         self.main()
         keep_running = True
         while keep_running:
-            time.sleep(0.12)
+            self.hook()
+            #time.sleep(0.12)
             if self.child_connection.poll():
                 msg = self.child_connection.recv()
+                log.debug("received msg: %s" % msg)
                 if msg == 'quit':
                     keep_running = False
                     sys.exit()

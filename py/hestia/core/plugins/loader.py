@@ -1,19 +1,18 @@
 from hestia.core.structures.container_singleton import *
 from hestia.core.structures.container_obj import ObjectProxy
-import hestia.core.logging
 
 from import_default import default_import_manager
 from helpers import *
 from multiprocessing import *
 
 import helpers
+import threading
 import logging as log
 import traceback
 import inspect
 import sys
 import imp
 
-logging.getLogger('hestia.core.plugins.loader')
 
 class loader(Singleton3):
     def __init__(self, manager=None):
@@ -26,12 +25,16 @@ class loader(Singleton3):
         default = default_import_manager()
         default.load_imports()
         self.__imports = default.imports
-        self.process_imports()
+        log.debug("processing imports")
         #log.debug("stuff and things")
 
     def process_imports(self):
         for module in self.__imports:
+            #log.debug(module)
+            #t = threading.Thread(target=self.process_module, args=(module,))
+            #t.start()
             self.process_module(module)
+            
             
     def __repr__(self):
         return ("<Loader for %s>" % (self.__imports))
@@ -76,7 +79,8 @@ class loader(Singleton3):
     #        return self.class_instances[attr]
             
     def load_class(self, module, class_object):
-        self.class_instances[module.__name__][class_object.__name__] = class_object()
+        pass
+        #self.class_instances[module.__name__][class_object.__name__] = class_object()
 
     def system_loaded_module(self, module):
         if sys.modules.has_key(module):

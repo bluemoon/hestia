@@ -1,7 +1,7 @@
 import unittest
-import container_singleton
+from all import *
 
-class Dummy(container_singleton.Singleton):
+class Dummy(Singleton):
     pass
 
 class Dummy2(Dummy):
