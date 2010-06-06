@@ -38,7 +38,7 @@ class Recompile(Component):
         #subprocess.call(self.command, shell=True)
         proc = subprocess.Popen(self.command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         return_code = proc.wait()  
-        print return_code
+        #print return_code
          
         self.inotify.add(self.directory, mask=IN_MODIFY)
         self.logger.debug("Adding the watch on %s" % self.directory)

@@ -1,6 +1,8 @@
 #from hestia.core.prompt import SimplePrompt
 from circuits.core import Event, Component, Manager
 from circuits import Debugger
+
+import circuits.tools as tools
 from hestia.core.plugins.loader_threaded import *
 from hestia.core.recompile import Recompile
 from hestia.core.prompt import SimplePrompt
@@ -27,8 +29,9 @@ class Main:
         m += Recompile(directory='py')
         m += GtkStatusIcon('py')
         m += Debugger()
-
-        m.start(process=True) 
+        print tools.inspect(m)
+        #m.start(process=True)
+        m.run()
 
         #self.event_driven = Recompile(directory='py') + 
         #self.event_driven.start(process=True)
