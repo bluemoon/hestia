@@ -4,6 +4,7 @@ from threading import Timer
 from Queue import Empty
 from collections import deque
 
+import multiprocessing
 import sched
 import time
 
@@ -30,12 +31,16 @@ class RepeatTimer(Thread):
     def cancel(self):
         self.finished.set()
 
-class scheduler:
-    def __init__(self):
+class scheduler(multiprocessing.Process):
+    def __init__(self, work):
+        multiprocessing.Process.__init__(self)
+        
         self.tasks = {}
         self.timing_interval = 0.5
-        self.work_queue    = deque([])
+        self.work_queue    = deque(work)
         self.process_queue = deque([])
+        
+    def run(self):
         self.repeating = RepeatTimer(self.timing_interval, self.do_work)
         
     def do_work(self):

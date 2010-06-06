@@ -1,6 +1,8 @@
+from hestia.core.plugins.helpers import *
+
 import logging
 from inspect import *
-from helpers import *
+
 import os
 
 LOG_FILENAME = 'container_obj.log'

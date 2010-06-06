@@ -5,7 +5,10 @@ import sys
 import time
 import multiprocessing
 
-class Simple(cmd.Cmd):
+from . import fileHandler
+fileHandler.doRollover()
+
+class SimplePrompt(cmd.Cmd):
     def __init__(self, loader):
         cmd.Cmd.__init__(self)
         self.prompt = 'hestia% '
@@ -20,6 +23,12 @@ class Simple(cmd.Cmd):
             print self.loader.receive('monitoring.monitor', 'basic_monitor')
         #print self.loader.get_queue('monitoring.monitor', 'basic_monitor')
 
+    def help_msg(self):
+        pass
+    
+    def do_labelchange(self, new_label):
+        self.loader.send('hestia.gui.gtk_gui', 'GTK_UI', new_label)
+        
     def do_msg(self, line):
         pieces = line.split(' ')
         self.loader.send(pieces[0], pieces[1], pieces[2])
@@ -39,15 +48,14 @@ class Simple(cmd.Cmd):
 class Main:
     def __init__(self):
         self.loader = loader_threaded()
-
         
     def main(self):
-        Simple(self.loader).cmdloop()
+        SimplePrompt(self.loader).cmdloop()
 
 
 def main():
-    main = Main()
-    main.main()
+    main = Main().main()
+
     
 if __name__ == "__main__":
     main()

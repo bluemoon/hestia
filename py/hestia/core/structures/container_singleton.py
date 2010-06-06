@@ -1,5 +1,5 @@
 from multiprocessing import Lock
-from helpers import *
+from hestia.core.plugins.helpers import *
 import inspect
 import __builtin__
 __builtin__.instance = {}

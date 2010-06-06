@@ -1,32 +1,33 @@
-from container_singleton import *
-from container_obj import ObjectProxy
+from hestia.core.structures.container_singleton import *
+from hestia.core.structures.container_obj import ObjectProxy
+import hestia.core.logging
+
 from import_default import default_import_manager
 from helpers import *
+from multiprocessing import *
 
 import helpers
-import logging
+import logging as log
 import traceback
 import inspect
 import sys
 import imp
 
-import __builtin__
-LOG_FILENAME = 'loader.log'
-logging.raiseExceptions = False
-logging.basicConfig(filename=LOG_FILENAME, level=logging.DEBUG)
+logging.getLogger('hestia.core.plugins.loader')
 
 class loader(Singleton3):
     def __init__(self, manager=None):
-        self.modules = {}
-        self.module_classes = {}
-        self.module_functions = {}
-        self.class_instances = {}
-        self.proxy_objects = {}
-        
+        self.modules            = {}
+        self.module_classes     = {}
+        self.module_functions   = {}
+        self.class_instances    = {}
+        self.proxy_objects      = {}
+
         default = default_import_manager()
         default.load_imports()
         self.__imports = default.imports
         self.process_imports()
+        #log.debug("stuff and things")
 
     def process_imports(self):
         for module in self.__imports:

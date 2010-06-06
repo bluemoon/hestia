@@ -1,4 +1,4 @@
-from container_singleton import *
+from hestia.core.structures.container_singleton import *
 from helpers import *
 
 class ImportBase(Singleton3):

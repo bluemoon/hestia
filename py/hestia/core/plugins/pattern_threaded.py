@@ -1,12 +1,17 @@
+from multiprocessing import Process
 import sys
 import inspect
 import time
 
 class threading_pattern:
     def __init__(self, child=None, parent=None):
+        #super(threading_pattern, self).__init__()
         self.child_connection = child
         self.parent_queue     = parent
 
+    def run_hook(self, *args, **kwargs):
+        pass
+    
     def main(self):
         pass
     
@@ -14,7 +19,7 @@ class threading_pattern:
         self.child_connection = child_connection
         self.lock = lock
         self.parent_queue = parent_queue
-        #self.main()
+        self.main()
         keep_running = True
         while keep_running:
             time.sleep(0.12)
