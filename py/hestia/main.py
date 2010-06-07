@@ -4,11 +4,11 @@ from circuits import Debugger
 
 import circuits.tools as tools
 from hestia.core.plugins.loader_threaded import *
-from hestia.core.recompile import Recompile
-from hestia.core.prompt import SimplePrompt
-from hestia.core.gnome_monitor import main as _main
-from hestia.monitoring.gnome_notification import GtkStatusIcon
 
+#from hestia.core.prompt import SimplePrompt
+#from hestia.core.gnome_monitor import main as _main
+from hestia.monitoring.statusicon import GtkStatusIcon
+from hestia.monitoring.recompile  import Recompile
 import logging as log
 
 import cmd
@@ -29,29 +29,7 @@ class Main:
         #print tools.inspect(m)
         m.run()
 
-        #self.event_driven = Recompile(directory='py') + 
-        #self.event_driven.start(process=True)
-        
-        #self.status_icon = 
-        #self.status_icon.start(process=True)
-        #self.loader = loader_threaded() 
-        #self.loader.process_imports()
-        #_main(sys.argv)
-  
-        
-        p = SimplePrompt()
-        #p.cmdloop()
-        #threading.Thread(target=self.threaded).start()
-         
-    def threaded(self): 
-        while True:
-            for x in self.loader.process_iterator():
-                x.is_alive()   
-            if not self.loader.Queue.empty():   
-                msg = self.loader.Queue.get()
-                log.debug("msg: " + msg) 
-                if msg == "quit": 
-                    sys.exit() 
+
     
 def main():   
     main = Main()

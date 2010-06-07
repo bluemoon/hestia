@@ -43,11 +43,16 @@ class GtkStatusIcon(Component):
 
         self.good_icon_path = '/usr/local/share/icons/hestia/24-em-check.png'#"/usr/local/share/notifier/icons/24-em-check.png"
         self.bad_icon_path  = '/usr/local/share/icons/hestia/24-em-cross.png'#"/usr/local/share/notifier/icons/24-em-cross.png"
-
+        
         #self.timeout_source = gobject.timeout_add(self.timeout, self.timeout_callback)
         self.statusIcon = gtk.StatusIcon()
         
         self.menu = gtk.Menu()
+        #self.item = gtk.CheckMenuItem('  Compile?')
+        #self.item.connect('activate', self.execute_cb, self.item)
+        #self.item.set_active(True)
+        #self.menu.append(self.item)
+        
         self.menuItem = gtk.ImageMenuItem(gtk.STOCK_EXECUTE)
         self.menuItem.connect('activate', self.execute_cb, self.statusIcon)
         self.menu.append(self.menuItem)

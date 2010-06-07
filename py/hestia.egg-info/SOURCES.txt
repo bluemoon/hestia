@@ -9,12 +9,9 @@ py/hestia.egg-info/entry_points.txt
 py/hestia.egg-info/not-zip-safe
 py/hestia.egg-info/top_level.txt
 py/hestia/core/__init__.py
-py/hestia/core/api.py
-py/hestia/core/core.py
 py/hestia/core/event_driven.py
 py/hestia/core/gnome_monitor.py
 py/hestia/core/prompt.py
-py/hestia/core/recompile.py
 py/hestia/core/settings.py
 py/hestia/core/plugins/__init__.py
 py/hestia/core/plugins/dispatcher.py
@@ -40,5 +37,5 @@ py/hestia/core/structures/decorator_threading.py
 py/hestia/gui/__init__.py
 py/hestia/gui/gtk_gui.py
 py/hestia/monitoring/__init__.py
-py/hestia/monitoring/monitor.py
+py/hestia/monitoring/recompile.py
 py/hestia/monitoring/statusicon.py
