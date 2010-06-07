@@ -22,15 +22,11 @@ fileHandler.doRollover()
 
 class Main:  
     def main(self):
-        #manager = Manager()
-        #manager += Recompile()
-        #manager += INotifyDriver()
         m = Manager()
         m += Recompile(directory='py')
         m += GtkStatusIcon('py')
-        m += Debugger()
-        print tools.inspect(m)
-        #m.start(process=True)
+        #m += Debugger()
+        #print tools.inspect(m)
         m.run()
 
         #self.event_driven = Recompile(directory='py') + 
@@ -44,7 +40,7 @@ class Main:
   
         
         p = SimplePrompt()
-        p.cmdloop()
+        #p.cmdloop()
         #threading.Thread(target=self.threaded).start()
          
     def threaded(self): 

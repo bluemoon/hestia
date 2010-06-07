@@ -4,7 +4,7 @@ from circuits.drivers._inotify import *
 from circuits.core import Event, Component, Manager
 from circuits import handler
 from hestia import *
-
+import time
 import logging
 import subprocess
 
@@ -13,7 +13,7 @@ class E(Event):
         super(E, self).__init__(*args, **kwargs)
         self.channel = self.__class__.__name__
 
-class returncode(E):
+class returncode(E): 
     pass
 
 class Recompile(Component):
@@ -28,20 +28,18 @@ class Recompile(Component):
 
         
     @handler("modified") 
-    def on_modified(self, *args, **kwargs):  
-        #print args, kwargs
+    def on_modified(self, *args, **kwargs):
+        start = time.time()
         self.logger.debug("%s file modified" % args[2])
         self.logger.debug("Removing the watch on %s" % self.directory)
         self.inotify.remove(self.directory, recursive=True)
         self.logger.debug("Running %s" % self.command)
-        #p = subprocess.Popen(self.command, shell=True)
-        #subprocess.call(self.command, shell=True)
         proc = subprocess.Popen(self.command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         return_code = proc.wait()  
-        #print return_code
-         
         self.inotify.add(self.directory, mask=IN_MODIFY)
         self.logger.debug("Adding the watch on %s" % self.directory)
-        self.push(returncode(return_code)) 
-         
+        end = time.time()
+        time_diff = end - start 
+        self.push(returncode(return_code, time_diff))
+    
 

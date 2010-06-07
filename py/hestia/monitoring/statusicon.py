@@ -24,7 +24,6 @@ try:
 except:
     pass
 
-
 try:
     import pynotify
     pynotify.init("Hestia")
@@ -57,28 +56,28 @@ class GtkStatusIcon(Component):
         self.menuItem.connect('activate', self.quit_cb, self.statusIcon)
         self.menu.append(self.menuItem)
         
+        self.last_build_time = "0"        
         self.statusIcon.connect('popup-menu', self.popup_menu_cb, self.menu)
         self.statusIcon.set_from_file(self.good_icon_path)
         self.statusIcon.set_visible(True)
         self.statusIcon.set_tooltip("Monitoring (%s)" % directory)
-        
+
     @handler("returncode")
     def on_returncode(self, *args):
         status = args[0]
-        logging.debug(args)
-        if PYNOTIFY:
+        time = args[1]
+        
+        #logging.debug(args)
+        if PYNOTIFY and status != 0:
             if pynotify.init("Hestia"):
-                n = pynotify.Notification("Build status", "build status: %d" % status)
-                if int(status) != 0:
-                    n.set_icon_from_pixbuf(gtk.gdk.pixbuf_new_from_file(self.bad_icon_path))
-                else:
-                    n.set_icon_from_pixbuf(gtk.gdk.pixbuf_new_from_file(self.good_icon_path))
-                    
+                n = pynotify.Notification("Build status", "build time: %fs" % (time))
+                n.set_icon_from_pixbuf(gtk.gdk.pixbuf_new_from_file(self.bad_icon_path))
+                                    
                 n.set_timeout(1)
                 #n.set_urgency(pynotify.URGENCY_NORMAL)
                 #n.set_timeout(pynotify.EXPIRES_NEVER)
                 n.show()
-
+        self.statusIcon.set_tooltip("build time %fs" % time)
         if int(status) != 0:
             self.set_icon(self.bad_icon_path)
         else:

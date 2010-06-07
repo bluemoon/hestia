@@ -40,5 +40,5 @@ py/hestia/core/structures/decorator_threading.py
 py/hestia/gui/__init__.py
 py/hestia/gui/gtk_gui.py
 py/hestia/monitoring/__init__.py
-py/hestia/monitoring/gnome_notification.py
 py/hestia/monitoring/monitor.py
+py/hestia/monitoring/statusicon.py
