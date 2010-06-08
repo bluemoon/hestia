@@ -1,5 +1,7 @@
 #!/usr/bin/python
 import pygtk
+import signal
+import logging as log
 from circuits.core import Component
 from circuits.core.handlers import handler
 from circuits.drivers._inotify import *
@@ -57,13 +59,15 @@ class gtk_status_icon(Component):
         self.statusIcon.set_from_file(self.good_icon_path)
         self.statusIcon.set_visible(True)
         self.statusIcon.set_tooltip("Monitoring (%s)" % self.directory)
-        self.queue = []
+
+        self.log = log.getLogger('')
         
     @handler("return_code")
     def on_returncode(self, *args):
         time = args[0]
         command_name = args[1]
-        status = (args[2][0] == args[2][1])
+        status = (args[2][0]._value == args[2][1]._value)
+        self.log.debug(status)
         
         if PYNOTIFY and not status:
             self.push(Notification("Command status", "'%s' command run time: %fs" % (command_name[0], time), self.bad_icon_path))
@@ -77,7 +81,9 @@ class gtk_status_icon(Component):
                
         return True   
     
-    def quit_cb(self, *args): 
+    def quit_cb(self, *args):
+        #signal.signal(signal.SIGALRM, handler)
+
         self.stop()
         
     def execute_cb(self, widget, event, data = None):

@@ -10,7 +10,7 @@ TERM_END     = "\033[1;m"
 DATE_FMT     = '%H:%M:%S'
 FORMAT = '%(asctime)s %(levelname)s: [m:%(module)s f:%(funcName)s  l:%(lineno)s]: %(message)s' 
 LOG_FILENAME = 'logs/hestia.log'
-
+global fileHandler
 fileHandler = logging.handlers.RotatingFileHandler(LOG_FILENAME)
 
 logging.raiseExceptions = False

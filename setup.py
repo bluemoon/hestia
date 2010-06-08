@@ -31,7 +31,7 @@ class file_versions:
 
     def _version(self):
         version = self.get_version()
-        if self.autoincrement:
+        if self.autoincrement and 'install' in sys.argv:
             version += 1
         self.write_version(version)
         return self.base_version + self.formatting_string % (version)
@@ -48,20 +48,18 @@ class repo_versions(file_versions):
         commit_count = len(repo.revision_history(repo.head())) + 1
         return commit_count
     
-    def write_version_file(self):
+    def write_version_file(self, version):
         directory = os.path.dirname(__file__)
         f = open(os.path.join(directory, 'src', 'hestia', '__version__.py'), 'w')
         f.write("# This file is auto-generated.\n")
-        f.write("version = %r\n" % self._version())
+        f.write("version = %r\n" % version)
         f.close()        
 
-    def version(self):
-        v = self._version()
-        self.write_version_file()
-        return v
+
     
 build_version = file_versions('.build_num')
 repo_version = repo_versions('.repo_num', base=VERSION, string_format=".%s", increment=False)
+repo_version.write_version_file(repo_version + build_version)
 
 setup(
     name = "hestia",

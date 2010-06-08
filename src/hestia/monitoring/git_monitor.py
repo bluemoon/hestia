@@ -8,24 +8,24 @@ from hestia.core.common_events import *
 from hestia import *
 
 MINUTE = 60
-
 class git_monitor(Component):
-    def __init__(self, freq=20, channel='git'):
+    def __init__(self, freq=20*MINUTE, channel='git'):
         super(git_monitor, self).__init__(channel=channel)
         self._freq = freq
+        self.target_time = time.time() + self._freq
 
-    def _sleep(self, rtime):
-        if self._freq > 0:
-            ctime = time.time()
-            s = self._freq - (ctime - rtime)
-            if s > 0:
-                time.sleep(s)
-                
-        
     def __tick__(self):
-        print 'tick'
+        self.poll()
+        
+    def run(self):
         t = subprocess.Popen('git pull', shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         
-        rtime = time.time()
-        self._sleep(rtime)
+        
+    def poll(self):
+        if time.time() > self.target_time:
+            self.run()
+            rtime = time.time()
+            self.target_time = rtime + self._freq
+        
+
 
