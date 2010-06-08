@@ -41,6 +41,6 @@ setup(
         'console_scripts': [
             'hestia = hestia.main:main',
             ],
-        'hestia.ui' : ['hestia.ui=hestia.ui']
+        #'hestia.ui' : ['hestia.ui=hestia.ui']
         }
 )

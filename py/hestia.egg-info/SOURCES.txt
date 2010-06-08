@@ -42,6 +42,7 @@ py/hestia/core/structures/container_singleton.py
 py/hestia/core/structures/decorator_threading.py
 py/hestia/monitoring/__init__.py
 py/hestia/monitoring/directory_monitor.py
+py/hestia/monitoring/git_monitor.py
 py/hestia/ui/__init__.py
 py/hestia/ui/gnome_monitor.py
 py/hestia/ui/gtk_gui.py
