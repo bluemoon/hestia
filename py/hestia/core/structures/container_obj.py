@@ -18,8 +18,13 @@ class Obj(object):
                
  
 class ObjectProxy(object):
-    def __init__(self, constructor=None):
-        self.__con = constructor
+    def __init__(self, dictionary=None):
+        if dictionary:
+            for a, b in dictionary.items():
+                if isinstance(b, (list, tuple)):
+                    setattr(self, a, [ObjectProxy(x) if isinstance(x, dict) else x for x in b])
+                else:
+                    setattr(self, a, ObjectProxy(b) if isinstance(b, dict) else b)
 
     def __repr__(self):
         return '<ObjectProxy [%s]>' % ', '.join(self.__dict__.keys())

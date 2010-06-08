@@ -3,6 +3,7 @@ import pygtk
 from circuits.core import Component
 from circuits.core.handlers import handler
 from circuits.drivers._inotify import *
+from hestia.core.common_events import *
 
 pygtk.require('2.0')
 
@@ -26,9 +27,11 @@ class gtk_status_icon(Component):
         while gtk.events_pending():
             gtk.main_iteration_do(block=True)
 
-    def __init__(self, directory):
+    def __init__(self, settings=None):
         super(gtk_status_icon, self).__init__(channel=self.channel)
-
+        self.directory = settings.config.project.monitor_directory
+        #print self.settings.config
+        
         self.good_icon_path = '/usr/local/share/icons/hestia/24-em-check.png'#"/usr/local/share/notifier/icons/24-em-check.png"
         self.bad_icon_path  = '/usr/local/share/icons/hestia/24-em-cross.png'#"/usr/local/share/notifier/icons/24-em-cross.png"
         
@@ -53,24 +56,28 @@ class gtk_status_icon(Component):
         self.statusIcon.connect('popup-menu', self.popup_menu_cb, self.menu)
         self.statusIcon.set_from_file(self.good_icon_path)
         self.statusIcon.set_visible(True)
-        self.statusIcon.set_tooltip("Monitoring (%s)" % directory)
+        self.statusIcon.set_tooltip("Monitoring (%s)" % self.directory)
 
     @handler("returncode")
     def on_returncode(self, *args):
         status = args[0]
         time = args[1]
+        command_name = args[2]
         
-        #logging.debug(args)
-        if PYNOTIFY and status != 0:
-            if pynotify.init("Hestia"):
-                n = pynotify.Notification("Build status", "build time: %fs" % (time))
-                n.set_icon_from_pixbuf(gtk.gdk.pixbuf_new_from_file(self.bad_icon_path))
-                                    
-                n.set_timeout(1)
-                #n.set_urgency(pynotify.URGENCY_NORMAL)
-                #n.set_timeout(pynotify.EXPIRES_NEVER)
-                n.show()
+        #logging.debug(args) 
+        if PYNOTIFY: 
+            self.push(Notification("Command status", "'%s' command run time: %fs" % (command_name[0], time), self.bad_icon_path))
+            #if pynotify.init("Hestia"):
+            #    n = pynotify.Notification("Build status", "build time: %fs" % (time))
+            #    n.set_icon_from_pixbuf(gtk.gdk.pixbuf_new_from_file(self.bad_icon_path))
+            #                        
+            #    n.set_timeout(1)
+            #    #n.set_urgency(pynotify.URGENCY_NORMAL)
+            #    #n.set_timeout(pynotify.EXPIRES_NEVER)
+            #    n.show()
+                
         self.statusIcon.set_tooltip("build time %fs" % time)
+        
         if int(status) != 0:
             self.set_icon(self.bad_icon_path)
         else:
@@ -79,7 +86,6 @@ class gtk_status_icon(Component):
         return True
     
     def quit_cb(self, *args):
-        print args
         self.stop()
         
     def execute_cb(self, widget, event, data = None):
