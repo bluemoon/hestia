@@ -4,6 +4,7 @@ py/events/__init__.py
 py/events/event_driven.py
 py/events/manager.py
 py/hestia/__init__.py
+py/hestia/__version__.py
 py/hestia/main.py
 py/hestia/settings.py
 py/hestia.egg-info/PKG-INFO
