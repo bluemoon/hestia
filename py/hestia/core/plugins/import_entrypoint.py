@@ -11,12 +11,13 @@ class import_entrypoint(ImportBase):
         if not has_pkg:
             return
 
-        for entrypoint in ['py.core', 'py.gui']:
+        for entrypoint in ['hestia']:
             for ep in iter_entry_points(entrypoint):
                 try:
                     plug = ep.load()
                 except Exception, e:
                     warn("Unable to load plugin %s: %s" % (ep, e), RuntimeWarning)
                     continue
-                self._loadPlugin(plug())
+                #self._loadPlugin(plug())
+                #print plug
 

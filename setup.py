@@ -40,6 +40,7 @@ setup(
     entry_points = {
         'console_scripts': [
             'hestia = hestia.main:main',
-            ]
+            ],
+        'hestia.ui' : ['hestia.ui=hestia.ui']
         }
 )

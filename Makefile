@@ -4,7 +4,7 @@ PYTHON=python2.6
 
 all:
 	$(PYTHON) setup.py build -f
-	nosetests -sv py
+#nosetests -sv py
 
 install:
 	$(PYTHON) setup.py install 

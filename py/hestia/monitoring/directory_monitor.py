@@ -22,22 +22,25 @@ class directory_monitor(Component):
         self.inotify.add(self.directory, mask=IN_MODIFY)
 
  
-        
+    def unload(self):
+        self.inotify.remove(self.directory, recursive=True)
+    def load(self):
+        self.inotify.add(self.directory, mask=IN_MODIFY)
     def modified(self, *args, **kwargs):
         start = time.time()  
         #self.logger.debug("%s file modified" % args[2])
         self.logger.debug("removing directory '%s' from watchlist" % self.directory)
-        self.inotify.remove(self.directory, recursive=True)
         
+        self.push(unload())
         self.logger.debug("Running build with %s" % self.build_cmd)
         build_return = self.push(cmd_run(self.build_cmd))
         self.logger.debug("Running tests with %s" % self.test_cmd)
         test_return  = self.push(cmd_run(self.test_cmd))
-        self.inotify.add(self.directory, mask=IN_MODIFY)
+        self.push(load())
         end = time.time()
         #if build_return == test_return:
         #print build_return
-        self.push(returncode(end - start, self.build_cmd, (build_return, test_return)))
+        self.push(return_code(end - start, self.build_cmd, (build_return, test_return)))
         #else: 
         #    print build_return, test_return
         #    self.push(returncode(1, end - start, self.test_cmd))

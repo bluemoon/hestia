@@ -77,6 +77,7 @@ class _Method:
         return self.__plugin(self.__name, *args)
     
 def locate(pattern, root=os.getcwd()):
+    print root
     for path, dirs, files in os.walk(root):
         for filename in [os.path.abspath(os.path.join(path, filename)) for filename in files if fnmatch.fnmatch(filename, pattern)]:
             yield filename
