@@ -3,11 +3,15 @@ from dulwich.repo import Repo
 import os
 import sys
 
+VERSION = "0.5"
+
+
 class file_versions:
-    def __init__(self, file_name, autoincrement=True):
+    def __init__(self, file_name, increment=True, base="", string_format=".b%d"):
         self.file_name = file_name
-        self.autoincrement = autoincrement
-        self.formatting_string = ".b%d"
+        self.autoincrement = increment
+        self.formatting_string = string_format
+        self.base_version = base
         
     def get_version(self):
         if not os.path.exists(self.file_name):
@@ -25,67 +29,43 @@ class file_versions:
         fhandle.write(str(version))
         fhandle.close()
 
-    def version(self):
+    def _version(self):
         version = self.get_version()
         if self.autoincrement:
             version += 1
         self.write_version(version)
-        return self.formatting_string % (version)
+        return self.base_version + self.formatting_string % (version)
 
+    def version(self):
+        return self._version()
 
+    def __add__(self, other):
+        return self.version() + other.version()
+
+class repo_versions(file_versions):
+    def get_version(self):
+        repo = Repo(".")
+        commit_count = len(repo.revision_history(repo.head())) + 1
+        return commit_count
+    
+    def write_version_file(self):
+        directory = os.path.dirname(__file__)
+        f = open(os.path.join(directory, 'src', 'hestia', '__version__.py'), 'w')
+        f.write("# This file is auto-generated.\n")
+        f.write("version = %r\n" % self._version())
+        f.close()        
+
+    def version(self):
+        v = self._version()
+        self.write_version_file()
+        return v
+    
 build_version = file_versions('.build_num')
-
-def version(version):
-    version = get_version(version)
-    write_version(version)
-    return version
-
-def get_build():
-    file_name = '.build_num'
-    if not os.path.exists(file_name):
-        return 0
-    else:
-        fhandle = open(file_name, 'r')
-        line = fhandle.readline()
-        build = int(line)
-        fhandle.close()
-        
-    return build
-
-def write_build(build=0):
-    file_name = '.build_num'
-    fhandle = open(file_name, 'w')
-    fhandle.write(str(build))
-    fhandle.close()
-
-def build():
-    build = get_build()
-    if 'install' in sys.argv:
-        build += 1        
-
-    write_build(build)
-    return ".b%d" % (build)
-
-def get_version(version):
-    repo = Repo(".")
-    commit_count = len(repo.revision_history(repo.head())) + 1
-    return version + ".%d" % commit_count
-    
-def write_version(version):
-    from hestia.__version__ import version as version_
-    if version == version_:
-        return
-    
-    directory = os.path.dirname(__file__)
-    f = open(os.path.join(directory, 'src', 'hestia', '__version__.py'), 'w')
-    f.write("# This file is auto-generated.\n")
-    f.write("version = %r\n" % version)
-    f.close()
-
+repo_version = repo_versions('.repo_num', base=VERSION, string_format=".%s", increment=False)
 
 setup(
     name = "hestia",
-    version = version("0.5") + build(),
+    version = repo_version + build_version,
     packages = find_packages('src'),
     package_dir = {'':'src'},
     data_files = [ ("share/notifier/icons", ['data/24-em-check.png','data/24-em-cross.png']) ],
