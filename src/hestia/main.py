@@ -34,7 +34,8 @@ class Main:
         
         if self.options.verbose:
             m += Debugger()
-            print inspect(m)   
+            print inspect(m)
+            
         m.run()
  
  

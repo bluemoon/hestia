@@ -6,6 +6,7 @@ from circuits.core import Event, Component
 from circuits.drivers._inotify import *
 from hestia.core.common_events import *
 from hestia import *
+import logging as log
 
 MINUTE = 60
 class git_monitor(Component):
@@ -13,11 +14,13 @@ class git_monitor(Component):
         super(git_monitor, self).__init__(channel=channel)
         self._freq = freq
         self.target_time = time.time() + self._freq
-
+        self.log = log.getLogger('')
+        
     def __tick__(self):
         self.poll()
         
     def run(self):
+        self.log.debug('running git pull')
         t = subprocess.Popen('git pull', shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         
         

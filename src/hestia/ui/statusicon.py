@@ -67,8 +67,6 @@ class gtk_status_icon(Component):
         time = args[0]
         command_name = args[1]
         status = (args[2][0]._value == args[2][1]._value)
-        self.log.debug(status)
-        
         if PYNOTIFY and not status:
             self.push(Notification("Command status", "'%s' command run time: %fs" % (command_name[0], time), self.bad_icon_path))
                  
@@ -83,8 +81,13 @@ class gtk_status_icon(Component):
     
     def quit_cb(self, *args):
         #signal.signal(signal.SIGALRM, handler)
-
-        self.stop()
+        #print self.__dict__
+        #print self.manager.stop()
+        #print self.channels
+        #print self.channels['manager'].stop()
+        #self.stop()
+        import sys
+        sys.exit()
         
     def execute_cb(self, widget, event, data = None):
         self.push(Modified('','', '', '', False ))

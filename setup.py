@@ -31,6 +31,7 @@ class file_versions:
 
     def _version(self):
         version = self.get_version()
+        print sys.argv
         if self.autoincrement and 'install' in sys.argv:
             version += 1
         self.write_version(version)
@@ -59,11 +60,12 @@ class repo_versions(file_versions):
     
 build_version = file_versions('.build_num')
 repo_version = repo_versions('.repo_num', base=VERSION, string_format=".%s", increment=False)
-repo_version.write_version_file(repo_version + build_version)
+VERSION = repo_version + build_version
+repo_version.write_version_file(VERSION)
 
 setup(
     name = "hestia",
-    version = repo_version + build_version,
+    version = VERSION,
     packages = find_packages('src'),
     package_dir = {'':'src'},
     data_files = [ ("share/notifier/icons", ['data/24-em-check.png','data/24-em-cross.png']) ],
