@@ -1,11 +1,10 @@
 [project]
-monitor_directory='src/hestia'
+monitor_directory='py/hestia'
 
 [build]
 command = ['python setup.py build -f']
 
 [test]  
-command = ['nosetests src']
- 
+command = ['nosetests py']
  
  
