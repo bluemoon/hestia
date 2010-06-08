@@ -1,30 +1,18 @@
 #from hestia.core.prompt import SimplePrompt
-from circuits.core import Event, Component, Manager
-from circuits import Debugger
-
-import circuits.tools as tools
-from hestia.core.plugins.loader_threaded import *
-
-#from hestia.core.prompt import SimplePrompt
-#from hestia.core.gnome_monitor import main as _main
-from hestia.monitoring.statusicon import GtkStatusIcon
-from hestia.monitoring.recompile  import Recompile
-import logging as log
-
-import cmd
-import sys
-import time 
-import threading
-import sys
+from circuits.core import Manager
+from hestia.monitoring.directory_monitor import directory_monitor
+from hestia.monitoring.statusicon import gtk_status_icon
 
 from . import fileHandler
+
+
 fileHandler.doRollover()
 
 class Main:  
     def main(self):
         m = Manager()
-        m += Recompile(directory='py')
-        m += GtkStatusIcon('py')
+        m += directory_monitor(directory='py')
+        m += gtk_status_icon('py')
         #m += Debugger()
         #print tools.inspect(m)
         m.run()

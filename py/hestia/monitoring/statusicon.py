@@ -1,22 +1,10 @@
 #!/usr/bin/python
-from subprocess  import PIPE, Popen, call
-from hestia import *
-from circuits.core import Event, Component, Manager
+import pygtk
+from circuits.core import Component
 from circuits.core.handlers import handler
 from circuits.drivers._inotify import *
-import circuits.tools as tools
 
-import pygtk
 pygtk.require('2.0')
-
-import gc
-import gobject
-import os
-import sys
-import time
-import dbus
-
-import logging
 
 try:
     import gtk
@@ -32,14 +20,14 @@ except:
     PYNOTIFY = False
 
  
-class GtkStatusIcon(Component):
+class gtk_status_icon(Component):
     channel = "inotify"
     def __tick__(self):
         while gtk.events_pending():
             gtk.main_iteration_do(block=True)
 
     def __init__(self, directory):
-        super(GtkStatusIcon, self).__init__(channel=self.channel)
+        super(gtk_status_icon, self).__init__(channel=self.channel)
 
         self.good_icon_path = '/usr/local/share/icons/hestia/24-em-check.png'#"/usr/local/share/notifier/icons/24-em-check.png"
         self.bad_icon_path  = '/usr/local/share/icons/hestia/24-em-cross.png'#"/usr/local/share/notifier/icons/24-em-cross.png"
