@@ -175,3 +175,5 @@ dist/*
 /py/hestia/.ropeproject/config.py
 /py/hestia/.ropeproject/history
 /py/hestia/.ropeproject/objectdb
+
+circuits/*
